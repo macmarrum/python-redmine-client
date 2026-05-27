@@ -128,7 +128,7 @@ class TestProjects:
             json={
                 "projects": [
                     {"id": 1, "name": "Project A", "identifier": "project-a"},
-                    {"id": 2, "name": "Project B", "identifier": "project-b"},
+                    {"id": 2, "name": "Project B", "identifier": "project-b", "parent": {"id": 1, "name": "Project A"}},
                 ],
                 "total_count": 2,
             }
@@ -138,7 +138,9 @@ class TestProjects:
 
         assert len(projects) == 2
         assert projects[0].name == "Project A"
+        assert projects[0].parent is None
         assert projects[1].identifier == "project-b"
+        assert projects[1].parent.name == "Project A"
 
 
 class TestIssues:
