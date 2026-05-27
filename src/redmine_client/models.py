@@ -54,6 +54,15 @@ class RedmineCustomFieldDefinition(BaseModel):
     model_config = {"extra": "ignore"}
 
 
+class RedmineProjectParent(BaseModel):
+    """Redmine parent project reference."""
+
+    id: int
+    name: str
+
+    model_config = {"extra": "ignore"}
+
+
 class RedmineProject(BaseModel):
     """Redmine Projekt."""
 
@@ -65,6 +74,7 @@ class RedmineProject(BaseModel):
     is_public: bool | None = None
     created_on: str | None = None
     updated_on: str | None = None
+    parent: RedmineProjectParent | None = None
     custom_fields: list[RedmineCustomField] | None = None
 
     model_config = {"populate_by_name": True, "extra": "ignore"}
