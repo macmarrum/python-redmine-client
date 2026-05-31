@@ -9,24 +9,23 @@ from settings import Env, Settings
 s = Settings.of(Env.local)
 
 
+def walk_project_tree(client: RedmineClient, pid_to_children: dict[int | None, list[RedmineProject]], parent_id: int | None = None, level=0):
+    child_projects: list[RedmineProject] = pid_to_children.get(parent_id, [])
+    for proj in child_projects:
+        yield proj, level
+        yield from walk_project_tree(client, pid_to_children, proj.id, level + 1)
+
+
 def print_project_tree():
     pid_to_children = {}
-
-    def print_tree(client: RedmineClient, parent_id: int | None = None, depth=0):
-        indent = '  ' * depth
-        child_projects: list[RedmineProject] = pid_to_children.get(parent_id, [])
-        for proj in child_projects:
-            print(f"{indent}{proj.identifier}")
-            for isu in client.get_issues(proj.id):
-                print(f"{indent}- ({isu.id}) {isu.subject}")
-            print_tree(client, proj.id, depth + 1)
-
-    with RedmineClient(s.base_url, s.api_key) as c:
-        project: RedmineProject
-        for project in c.get_projects():
+    with RedmineClient(s.base_url, s.api_key) as client:
+        for project in client.get_projects():
             pid = project.parent.id if project.parent else None
             pid_to_children.setdefault(pid, []).append(project)
-        print_tree(c, parent_id=None)  # start with top-level projects
+        for proj, level in walk_project_tree(client, pid_to_children, parent_id=None):  # start with top-level
+            print(f"{'  ' * level}{{{proj.id}}} {proj.identifier}")
+            for isu in client.get_issues(proj.id):
+                print(f"{'  ' * (level + 1)}- ({isu.id}) {isu.subject}")
     pass
 
 
