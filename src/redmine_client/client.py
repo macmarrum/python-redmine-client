@@ -310,6 +310,7 @@ class RedmineClient:
     def get_issues(
         self,
         project_id: int | str | None = None,
+        subproject_id: int | str | None = None,
         assigned_to_id: int | str | None = None,
         status_id: str | int | None = None,
         tracker_id: int | None = None,
@@ -322,6 +323,7 @@ class RedmineClient:
 
         Args:
             project_id: Filter nach Projekt
+            subproject_id: Filter nach Unterprojekt
             assigned_to_id: Filter nach Zugewiesenem (oder "me")
             status_id: Filter nach Status ("open", "closed", "*", oder ID)
             tracker_id: Filter nach Tracker
@@ -332,6 +334,8 @@ class RedmineClient:
         params: dict[str, Any] = {}
         if project_id:
             params["project_id"] = project_id
+        if subproject_id:
+            params["subproject_id"] = subproject_id
         if assigned_to_id:
             params["assigned_to_id"] = assigned_to_id
         if status_id:
