@@ -24,7 +24,7 @@ def print_project_tree():
             pid_to_children.setdefault(pid, []).append(project)
         for proj, level in walk_project_tree(client, pid_to_children, parent_id=None):  # start with top-level
             print(f"{'  ' * level}{{{proj.id}}} {proj.identifier}")
-            for isu in client.get_issues(proj.id):
+            for isu in client.get_issues(proj.id, subproject_id='!*'):
                 print(f"{'  ' * (level + 1)}- ({isu.id}) {isu.subject}")
     pass
 
