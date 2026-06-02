@@ -8,7 +8,7 @@ from settings import Env, Settings
 s = Settings.of(Env.local)
 
 
-def get_project_hierarchy(client: RedmineClient) -> dict[int | None, list[RedmineProject]]:
+def fetch_project_hierarchy(client: RedmineClient) -> dict[int | None, list[RedmineProject]]:
     pid_to_children = {}
     for project in client.get_projects():
         pid = project.parent.id if project.parent else None
@@ -25,7 +25,7 @@ def walk_project_tree(pid_to_children: dict[int | None, list[RedmineProject]], p
 
 def print_project_tree():
     with RedmineClient(s.base_url, s.api_key) as client:
-        pid_to_children = get_project_hierarchy(client)
+        pid_to_children = fetch_project_hierarchy(client)
         for proj, level in walk_project_tree(pid_to_children, parent_id=None):  # start with top-level
             print(f"{'  ' * level}{{{proj.id}}} {proj.identifier}")
             for isu in client.get_issues(proj.id, subproject_id='!*'):
