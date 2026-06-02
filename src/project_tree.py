@@ -5,7 +5,7 @@ from __future__ import annotations
 from redmine_client import RedmineClient, RedmineProject
 from settings import Env, Settings
 
-s = Settings.of(Env.local)
+default_settings = Settings.of(Env.local)
 
 
 def fetch_project_hierarchy(client: RedmineClient) -> dict[int | None, list[RedmineProject]]:
@@ -23,7 +23,8 @@ def walk_project_tree(pid_to_children: dict[int | None, list[RedmineProject]], p
         yield from walk_project_tree(pid_to_children, proj.id, level + 1)
 
 
-def print_project_tree():
+def print_project_tree(s: Settings | None = None):
+    s = s or default_settings
     with RedmineClient(s.base_url, s.api_key) as client:
         pid_to_children = fetch_project_hierarchy(client)
         for proj, level in walk_project_tree(pid_to_children, parent_id=None):  # start with top-level
@@ -33,7 +34,8 @@ def print_project_tree():
     pass
 
 
-def fetch_issues_subject(tracker_id: int | None = None, status_id: str | int | None = 'open'):
+def fetch_issues_subject(tracker_id: int | None = None, status_id: str | int | None = 'open', s: Settings | None = None):
+    s = s or default_settings
     issues = {}
     with RedmineClient(s.base_url, s.api_key) as client:
         pid_to_children = fetch_project_hierarchy(client)
