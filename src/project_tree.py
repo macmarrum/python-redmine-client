@@ -33,4 +33,5 @@ def print_project_tree():
     pass
 
 
-print_project_tree()
+if __name__ == '__main__':
+    print_project_tree()
