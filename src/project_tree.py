@@ -33,5 +33,17 @@ def print_project_tree():
     pass
 
 
+def fetch_issues_subject(tracker_id: int | None = None, status_id: str | int | None = 'open'):
+    issues = {}
+    with RedmineClient(s.base_url, s.api_key) as client:
+        pid_to_children = fetch_project_hierarchy(client)
+        for proj, level in walk_project_tree(pid_to_children, parent_id=None):  # start with top-level
+            if level > 0:  # only top-level, because all subprojects are queried below
+                break
+            for issue in client.get_issues(proj.id, subproject_id=None, status_id=status_id, tracker_id=tracker_id):
+                issues[issue.id] = {'subject': issue.subject}
+    return issues
+
+
 if __name__ == '__main__':
     print_project_tree()
